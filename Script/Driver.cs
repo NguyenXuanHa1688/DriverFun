@@ -17,10 +17,12 @@ public class Driver : MonoBehaviour
     private string SPEED_TAG = "SpeedBoost";
     private string OBJECT_TAG = "Object";
     private string LAKE_TAG = "Lake";
+    private string EXPLODE_TRIGGER = "IsExplode";
+    private Animator carAnimator;
     // Start is called before the first frame update
     void Start()
     {
-        
+        carAnimator = gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -30,6 +32,10 @@ public class Driver : MonoBehaviour
         float moveAmount = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
         transform.Rotate(0, 0, -steerAmount);
         transform.Translate(moveAmount, 0, 0);
+        if(timerText.currentTime <= 0f){
+            carAnimator.SetTrigger(EXPLODE_TRIGGER);
+            Destroy(gameObject, 0.4f);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -47,14 +53,15 @@ public class Driver : MonoBehaviour
         if(trigger.gameObject.CompareTag(DROP_TAG)){
             sCargo.cargoExist = false;
             sDrop.dropExist = true;
-            timerText.currentTime = 10f;
+            timerText.currentTime = 90f;
         } 
         if(trigger.gameObject.CompareTag(SPEED_TAG)){
             moveSpeed = moveSpeedBoost;
             dust.Play();
         }
         if(trigger.gameObject.CompareTag(LAKE_TAG)){
-            Destroy(gameObject);
+            carAnimator.SetTrigger(EXPLODE_TRIGGER);
+            Destroy(gameObject,0.4f);
         }
     }
 }
